@@ -1,0 +1,19 @@
+# Virtual environments
+lungenv/
+.venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Dataset
+Data/
+data/
+
+# Training outputs
+artifacts/
+logs/
+venv/

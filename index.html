@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lung Disease Detection</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f2f7fc;
+            color: #263445;
+        }
+
+        header {
+            background: #123b65;
+            color: white;
+            padding: 22px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-size: 23px;
+        }
+
+        header span {
+            font-size: 14px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 55px 20px 30px;
+        }
+
+        .hero h1 {
+            font-size: 34px;
+            color: #123b65;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            color: #667789;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 25px auto 60px;
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+        }
+
+        .container h2 {
+            text-align: center;
+            margin-bottom: 12px;
+            color: #123b65;
+        }
+
+        .description {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .upload-area {
+            border: 2px dashed #8bb8df;
+            border-radius: 12px;
+            padding: 35px 15px;
+            text-align: center;
+            background: #f8fbff;
+        }
+
+        .upload-area p {
+            margin-bottom: 15px;
+            color: #526579;
+        }
+
+        input[type="file"] {
+            max-width: 100%;
+            padding: 10px;
+        }
+
+        #preview {
+            display: none;
+            max-width: 100%;
+            max-height: 300px;
+            margin: 20px auto 0;
+            border-radius: 10px;
+        }
+
+        .predict-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: #1478bd;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .predict-btn:hover {
+            background: #105f98;
+        }
+
+        .predict-btn:disabled {
+            background: #91a9bd;
+            cursor: not-allowed;
+        }
+
+        #result {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #eaf5ff;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        #result h3 {
+            color: #123b65;
+            margin-bottom: 10px;
+        }
+
+        #prediction {
+            font-size: 21px;
+            font-weight: bold;
+            color: #1478bd;
+        }
+
+        #error {
+            display: none;
+            margin-top: 15px;
+            color: #c0392b;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #123b65;
+            color: white;
+            font-size: 13px;
+        }
+
+        .notice {
+            font-size: 12px;
+            color: #788797;
+            margin-top: 20px;
+            line-height: 1.5;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h2>🫁 LungCare AI</h2>
+        <span>AI-Powered X-Ray Analysis</span>
+    </header>
+
+    <section class="hero">
+        <h1>Lung Disease Detection</h1>
+
+        <p>
+            Upload a chest X-ray image and let our
+            deep learning model analyze it.
+        </p>
+    </section>
+
+    <main class="container">
+
+        <h2>Upload Chest X-Ray</h2>
+
+        <p class="description">
+            Select a JPG or PNG chest X-ray image for analysis.
+        </p>
+
+        <div class="upload-area">
+
+            <p>Choose your chest X-ray image</p>
+
+            <input
+                type="file"
+                id="xrayInput"
+                accept=".jpg,.jpeg,.png"
+            >
+
+            <img id="preview" alt="X-ray preview">
+
+        </div>
+
+        <button
+            class="predict-btn"
+            id="predictBtn"
+            onclick="predictImage()"
+        >
+            Analyze X-Ray
+        </button>
+
+        <div id="result">
+            <h3>Analysis Result</h3>
+            <p id="prediction"></p>
+        </div>
+
+        <p id="error"></p>
+
+        <p class="notice">
+            This project is for educational and research purposes.
+            Its predictions are not a medical diagnosis.
+        </p>
+
+    </main>
+
+    <footer>
+        Lung Disease Detection | Deep Learning Project
+    </footer>
+
+    <script>
+        const xrayInput = document.getElementById("xrayInput");
+        const preview = document.getElementById("preview");
+
+        xrayInput.addEventListener("change", function() {
+
+            const file = this.files[0];
+
+            document.getElementById("result").style.display = "none";
+            document.getElementById("error").style.display = "none";
+
+            if (file) {
+                preview.src = URL.createObjectURL(file);
+                preview.style.display = "block";
+            } else {
+                preview.style.display = "none";
+            }
+        });
+
+        async function predictImage() {
+
+            const file = xrayInput.files[0];
+
+            if (!file) {
+                alert("Please select a chest X-ray image first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const button = document.getElementById("predictBtn");
+            const result = document.getElementById("result");
+            const error = document.getElementById("error");
+
+            button.disabled = true;
+            button.innerText = "Analyzing...";
+
+            result.style.display = "none";
+            error.style.display = "none";
+
+            try {
+
+                const response = await fetch("/predict", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || "Prediction failed.");
+                }
+
+                document.getElementById("prediction").innerText =
+                    data.prediction;
+
+                result.style.display = "block";
+
+            } catch (err) {
+
+                error.innerText = err.message;
+                error.style.display = "block";
+
+            } finally {
+
+                button.disabled = false;
+                button.innerText = "Analyze X-Ray";
+
+            }
+        }
+    </script>
+
+</body>
+</html>
