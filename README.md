@@ -1,100 +1,196 @@
-#  Xray Lung Classifier
+# LungCare AI – Chest X-Ray Classification
 
-## Problem statement
-Pneumonia is an inflammatory condition of the lung affecting primarily the small air sacs known as alveoli.Symptoms typically include some combination of productive or dry cough, chest pain, fever and difficulty breathing. The severity of the condition is variable. Pneumonia is usually caused by infection with viruses or bacteria and less commonly by other microorganisms, certain medications or conditions such as autoimmune diseases.Risk factors include cystic fibrosis, chronic obstructive pulmonary disease (COPD), asthma, diabetes, heart failure, a history of smoking, a poor ability to cough such as following a stroke and a weak immune system. Diagnosis is often based on symptoms and physical examination. Chest X-ray, blood tests, and culture of the sputum may help confirm the diagnosis.The disease may be classified by where it was acquired, such as community- or hospital-acquired or healthcare-associated pneumonia.
-Our task is to create a API whichs predict whether the given images are penumonia or not.
+## Project Overview
 
-## Solution Proposed
-The solution proposed for the above problem is that we have used Computer vision to solve the above problem to classify the data. We have used the Pytorch
-framework to solve the above problem also we have have created our custom CNN network with the help of pytorch. Then we have created a API which takes in the images and predicts wheter a person is having Pneumonia or not. Then we have dockerized the application and deployed the model on AWS cloud.
+LungCare AI is a deep learning-based application that classifies chest X-ray images into two categories:
 
+- **NORMAL** – No pneumonia detected by the model.
+- **PNEUMONIA** – Features associated with pneumonia detected by the model.
 
-![xray_arch](https://user-images.githubusercontent.com/71321529/216753362-aeb34400-d21d-4b21-b2ce-63b86a47b594.jpg)
+The project uses a custom Convolutional Neural Network (CNN) developed using PyTorch and provides a web interface through FastAPI for uploading X-ray images and viewing predictions.
 
-## Dataset used
-The dataset was shared by Apollo diagnostic center for research purpose. So we hvae created a POC with the given data.
+This project is intended for educational and research purposes and is not a substitute for professional medical diagnosis.
 
-## Tech Stack Used
-1. Python 
-2. FastAPI 
-3. Pytorch
-4. Docker
-5. AWS
-6. Azure
+## Problem Statement
 
-## Infrastructure required
-1. AWS S3
-2. AWS App Runner
-3. Github Actions
+Pneumonia is a respiratory infection that causes inflammation in the air sacs of the lungs. Chest X-ray images are commonly used as part of the clinical process to help identify pneumonia.
 
-## How to run
+The objective of this project is to build a deep learning model that analyzes chest X-ray images and classifies them as NORMAL or PNEUMONIA.
 
-Step 1. Download the zip file
+## Proposed Solution
+
+The proposed solution uses computer vision and deep learning techniques.
+
+A custom CNN architecture is implemented using PyTorch. The model is trained locally using chest X-ray images and the best-performing model weights are saved as `xray_model.pth`.
+
+A FastAPI application loads the trained model, accepts uploaded X-ray images, preprocesses them, and returns the predicted class along with prediction scores.
+
+## Technology Stack
+
+- Python 3.10.11
+- PyTorch
+- Torchvision
+- FastAPI
+- Uvicorn
+- Pillow
+- HTML
+- CSS
+- JavaScript
+
+## Model Architecture
+
+The project uses a custom Convolutional Neural Network consisting of:
+
+- Five convolutional layers
+- Batch Normalization
+- ReLU activation functions
+- Max Pooling layers
+- Adaptive Average Pooling
+- Dropout layers
+- Fully connected classification layers
+
+The model accepts RGB images resized to 224 × 224 pixels and produces predictions for two classes: NORMAL and PNEUMONIA.
+
+## Data Preprocessing
+
+The following preprocessing steps are applied:
+
+1. Resize images to 224 × 224 pixels.
+2. Convert images to RGB format.
+3. Convert images into PyTorch tensors.
+4. Normalize images using ImageNet mean and standard deviation.
+5. Apply data augmentation during training, including random rotation and color jitter.
+
+## Model Training
+
+The model is trained locally using `train_local.py`.
+
+The training process includes:
+
+- Training and validation dataset splitting.
+- Weighted Cross Entropy Loss.
+- AdamW optimizer.
+- ReduceLROnPlateau learning rate scheduler.
+- Early stopping.
+- Saving the best model weights.
+
+The trained model is saved as:
+
+`xray_model.pth`
+
+## Project Structure
+
+```text
+LungCare-AI/
+│
+├── app.py
+├── index.html
+├── requirements.txt
+├── train_local.py
+├── train.py
+├── xray_model.pth
+├── README.md
+│
+├── flowcharts/
+│
+├── notebook/
+│
+├── scripts/
+│
+└── xray/
+    ├── components/
+    ├── constant/
+    ├── entity/
+    ├── ml/
+    │   └── model/
+    │       └── arch.py
+    └── pipeline/
 ```
-Download the zip file and extract it to a folder.
+
+## Installation and Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/aditinikalje123/Lungcare_AI-.git
 ```
-Step 2. Create a conda environment.
+
+### 2. Navigate to the project directory
+
+```bash
+cd Lungcare_AI-
 ```
-conda create -p env python=3.8 -y
+
+### 3. Create a virtual environment
+
+```bash
+python -m venv lungenv
 ```
+
+### 4. Activate the environment
+
+For Windows PowerShell:
+
+```powershell
+.\lungenv\Scripts\Activate.ps1
 ```
-conda activate ./env
-````
-Step 3. Install the requirements 
-```
+
+### 5. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
-Step 4. Export the environment variable
+
+## Running the Application
+
+Start the FastAPI application using:
+
 ```bash
-export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-
-export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
-
-export AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION>
-
+python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
 ```
-Step 5. Run the application server
+
+Open the application in your browser:
+
+```text
+http://127.0.0.1:8000
 ```
-python app.py
+
+FastAPI interactive documentation:
+
+```text
+http://127.0.0.1:8000/docs
 ```
-Step 6. Train application
+
+Health check endpoint:
+
+```text
+http://127.0.0.1:8000/health
+```
+
+## Training the Model
+
+To train the CNN model locally, run:
+
 ```bash
-http://localhost:8001/train
-```
-Step 7. Prediction application
-```bash
-http://localhost:8001/predict
-```
-## Run locally
-
-1. Check if the Dockerfile is available in the project directory
-
-2. Build the Docker image
-```
-docker build -t xray_classification .
+python train_local.py
 ```
 
-3. Run the Docker image
-```
-docker run -d -p 8001:8001 -e AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> -e AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> xray_classifier
-```
+The best model weights are saved to `xray_model.pth`.
 
-## Models Used
-* Custom CNN architecture
+## Prediction Workflow
 
-## `xray` is the main package folder which contains 
+1. Open the LungCare AI web application.
+2. Upload a chest X-ray image.
+3. The application preprocesses the uploaded image.
+4. The trained CNN model performs inference.
+5. The application displays the predicted class and prediction scores.
 
+## Disclaimer
 
-**Components** : Contains all components of Deep Learning(CV) Project
-- data_ingestion
-- data_transformation
-- model_training
-- model_evaluation
-- model_pusher
+LungCare AI is an educational deep learning project. Its predictions are not medical diagnoses and should not be used as the sole basis for medical decisions. Always consult a qualified healthcare professional.
 
+## Author
 
-**Custom Logger and Exceptions** are used in the Project for better debugging purposes.
+**Aditi Nikalje**
 
-## Conclusion
-- The project we have created can also be in real-life by doctors to check whether the person is having Pneumonia or not. It will help doctors to take
-better decisions.
+GitHub: https://github.com/aditinikalje123
